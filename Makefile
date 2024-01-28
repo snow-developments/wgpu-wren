@@ -13,7 +13,8 @@ test:
 .PHONY: test
 
 clean:
-	rm -rf bin
+	@rm -rf bin
+	@rm -f src/*.o
 	# TODO: rm -rf lib/**/wren_modules
 .PHONY: clean
 
