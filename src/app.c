@@ -43,6 +43,8 @@ int wrenAppRun(WrenApp* app) {
       case WREN_RESULT_COMPILE_ERROR: {
         fprintf(stderr, "Compile Error!\n");
         running = false;
+        wrenFreeVM(vm);
+        return EXIT_FAILURE;
       } break;
       case WREN_RESULT_RUNTIME_ERROR: {
         fprintf(stderr, "Runtime Error!\n");
@@ -53,6 +55,5 @@ int wrenAppRun(WrenApp* app) {
   }
 
   wrenFreeVM(vm);
-
   return 0;
 }
