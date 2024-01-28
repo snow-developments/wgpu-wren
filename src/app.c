@@ -12,8 +12,8 @@ typedef struct WrenApp {
 WrenApp* wrenAppNew(WrenAppConfig config) {
   if (config.vm == NULL) {
     wrenInitConfiguration(config.vm);
-    config.vm->writeFn = &writeFn;
-    config.vm->errorFn = &errorFn;
+    config.vm->writeFn = &_defaultWriteFn;
+    config.vm->errorFn = &_defaultErrorFn;
   }
 
   WrenApp* app = malloc(sizeof(WrenApp));
