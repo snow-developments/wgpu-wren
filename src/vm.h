@@ -6,7 +6,7 @@
 #include <wren.h>
 
 static void writeFn(WrenVM* vm, const char* text) {
-  printf("%s", text);
+  fprintf(stdout, "%s", text);
 }
 
 void errorFn(WrenVM* vm, WrenErrorType errorType,
@@ -14,13 +14,13 @@ void errorFn(WrenVM* vm, WrenErrorType errorType,
              const char* msg) {
   switch (errorType) {
     case WREN_ERROR_COMPILE: {
-      printf("[%s line %d] [Error] %s\n", module, line, msg);
+      fprintf(stderr, "[%s line %d] [Error] %s\n", module, line, msg);
     } break;
     case WREN_ERROR_STACK_TRACE: {
-      printf("[%s line %d] in %s\n", module, line, msg);
+      fprintf(stderr, "[%s line %d] in %s\n", module, line, msg);
     } break;
     case WREN_ERROR_RUNTIME: {
-      printf("[Runtime Error] %s\n", msg);
+      fprintf(stderr, "[Runtime Error] %s\n", msg);
     } break;
   }
 }
