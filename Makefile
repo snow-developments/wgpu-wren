@@ -31,28 +31,33 @@ ${SUBMODULES} &:
 # Wren
 ifeq (${CONFIG},debug)
   LIBS += wren_d
-  LIBWREN := wren/lib/libwren_d.a
-  LIBWREN_CONFIG := debug_64bit
+  LIB_WREN := wren/lib/libwren_d.a
+  LIB_WREN_CONFIG := debug_64bit
 else
   LIBS += wren
 endif
 LIB_DIRS += wren/lib
-LIBWREN ?= wren/lib/libwren.a
-LIBWREN_CONFIG ?= release_64bit
-${LIBWREN}: wren
-	@make --no-print-directory -C wren/projects/make wren config=${LIBWREN_CONFIG}
+LIB_WREN ?= wren/lib/libwren.a
+LIB_WREN_CONFIG ?= release_64bit
+${LIB_WREN}: wren
+	@make --no-print-directory -C wren/projects/make wren config=${LIB_WREN_CONFIG}
 
 # Wren Libraries
-libs:
+vendor/wren-vector/wren_modules:
 	@cd vendor/wren-vector && wrenc package.wren install
-.PHONY: libs
+
+######################
+# Vendored Libraries
+######################
+
+vendor: native.lock.yml
+	@CONFIG=${CONFIG} vendor/download.sh
+# TODO: Download wgpu-native binaries on Windows
+.PHONY: vendor
 
 # WebGPU
 WGPU := wgpu-${shell echo ${OS} | tr '[:upper:]' '[:lower:]'}-${ARCH}-${CONFIG}
 WGPU_DEST := vendor/${WGPU}
-vendor: ${WGPU_DEST}
-.PHONY: vendor
-
 ifneq (${OS},Windows)
   # LIBS += ${WGPU_DEST}/libwgpu_native.a
   LIBS += wgpu_native

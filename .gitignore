@@ -3,18 +3,6 @@ bin/
 src/*.o
 *.dwarf
 
-# Vendored wgpu sources
-vendor/wgpu-*/
-vendor/wgpu-*.zip
-
-# Example Artifacts
-/examples/headless
-/examples/headless.app
-/examples/red.png
-/examples/triangle
-/examples/triangle.app
-/examples/triangle.png
-
 # Temporary Files
 *~
 
