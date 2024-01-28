@@ -1,0 +1,25 @@
+docs/
+bin/
+*.dwarf
+
+# Vendored wgpu sources
+vendor/wgpu-*/
+vendor/wgpu-*.zip
+
+# Example Artifacts
+/examples/headless
+/examples/headless.app
+/examples/red.png
+/examples/triangle
+/examples/triangle.app
+/examples/triangle.png
+
+# Temporary Files
+*~
+
+# Precompiled C headers
+# See https://github.com/microsoft/vscode-cpptools/issues/3347
+/.vscode/ipch/
+
+# Environment config, see https://direnv.net
+.envrc
