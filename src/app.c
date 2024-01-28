@@ -1,6 +1,6 @@
 #include <wgpu.h>
 
-#include "../include/wgpu-wren.h"
+#include <wgpu-wren.h>
 #include "vm.h"
 
 typedef struct WrenApp {

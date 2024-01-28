@@ -1,7 +1,7 @@
 #include <wren.h>
 
-#include "file.h"
-#include "string.h"
+#include "lib/file.h"
+#include "lib/string.h"
 
 typedef struct WrenApp;
 

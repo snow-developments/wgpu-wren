@@ -70,7 +70,7 @@ ${WGPU_DEST}: native.lock.yml
 ###########
 
 CC ?= gcc
-INCLUDES := wren/src/include vendor/${WGPU}
+INCLUDES := include wren/src/include vendor/${WGPU}
 SOURCES := $(shell find include -name "*.h") $(shell find src -name "*.h")
 CFLAGS := $(patsubst %,-I%,$(INCLUDES))
 ifeq (${CONFIG},debug)
@@ -80,6 +80,7 @@ else
 endif
 LDFLAGS := $(patsubst %,-L%,${LIB_DIRS}) -static
 LDFLAGS += $(patsubst %,-l%,${LIBS}) -lm
+
 # See https://www.gnu.org/software/libtool/manual/html_node/Creating-object-files.html
 src/app.o: src/app.c ${SOURCES}
 	$(CC) -c src/app.c $(CFLAGS) -o $@
