@@ -1,0 +1,1 @@
+import "wgpu" for Device

@@ -1,12 +1,21 @@
+#pragma once
+
 #include <wren.h>
 
 #include "lib/file.h"
-#include "lib/string.h"
 
-typedef struct WrenApp;
+typedef struct WrenApp WrenApp;
 
 typedef struct WrenAppConfig {
-  WrenConfiguration* vm;
   String name;
   String entry;
+  WrenConfiguration* vm;
 } WrenAppConfig;
+
+WrenApp* wrenAppNew(WrenAppConfig config);
+/**
+ * @returns Whether the app's event loop should exit.
+ * @see `wrenAppRun`
+ */
+typedef bool (*Callback)(void* userData);
+int wrenAppRun(WrenApp* app, Callback callback, void* userData);

@@ -66,24 +66,26 @@ else
   $(error "Unsupported OS: ${OS)")
 endif
 
-${WGPU_DEST}: native.lock.yml
-	@CONFIG=${CONFIG} vendor/download.sh
-# TODO: Download wgpu-native binaries on Windows
+# GLFW
+vendor/glfw-3.3.9/src/libglfw3.a:
+	@cd vendor/glfw-3.3.9 && cmake -B build . && make glfw
+glfw: vendor vendor/glfw-3.3.9/src/libglfw3.a
+.PHONY: glfw
 
 ###########
 # Targets
 ###########
 
 CC ?= gcc
-INCLUDES := include wren/src/include vendor/${WGPU}
+INCLUDES := include wren/src/include vendor/${WGPU} vendor/glfw-3.3.9/include
 SOURCES := $(shell find include -name "*.h") $(shell find src -name "*.h")
-CFLAGS := $(patsubst %,-I%,$(INCLUDES))
+CFLAGS := $(shell pkg-config --cflags gl) $(patsubst %,-I%,$(INCLUDES))
 ifeq (${CONFIG},debug)
   CFLAGS += -g
 else
   CFLAGS += -O
 endif
-LDFLAGS := $(patsubst %,-L%,${LIB_DIRS}) -static
+LDFLAGS := $(patsubst %,-L%,${LIB_DIRS})
 LDFLAGS += $(patsubst %,-l%,${LIBS}) -lm
 
 # See https://www.gnu.org/software/libtool/manual/html_node/Creating-object-files.html
@@ -98,9 +100,14 @@ lib/libwgpu-wren.a: libwgpu-wren.a(src/app.o)
 # Applications
 ################
 
-bin/examples/triangle: libs ${LIBWREN}
+bin/examples/triangle: glfw ${LIB_WREN} src/app.o
 	@mkdir -p bin/examples
-	$(CC) src/examples/triangle.c $(CFLAGS) $(LDFLAGS) -o $@
+	$(CC) src/app.o src/file.c src/string.c src/examples/triangle.c $(CFLAGS) -pthread \
+	  $(LDFLAGS) -Lvendor/glfw-3.3.9/src -lglfw3 \
+	  $(shell pkg-config --static --libs gl) \
+	  $(shell pkg-config --static --libs x11) \
+	  -lm -lrt -ldl \
+	  -o $@
 
 # macOS troubleshooting:
 # https://stackoverflow.com/a/17704255/1363247

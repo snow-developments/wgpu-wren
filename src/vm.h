@@ -13,13 +13,13 @@ void _defaultErrorFn(
 ) {
   switch (errorType) {
     case WREN_ERROR_COMPILE: {
-      fprintf(stderr, "[%s line %d] [Error] %s\n", module, line, msg);
+      fprintf(stderr, "[%s:%d] Error: %s\n", module, line, msg);
     } break;
     case WREN_ERROR_STACK_TRACE: {
-      fprintf(stderr, "[%s line %d] in %s\n", module, line, msg);
+      fprintf(stderr, "[%s:%d] in %s\n", module, line, msg);
     } break;
     case WREN_ERROR_RUNTIME: {
-      fprintf(stderr, "[Runtime Error] %s\n", msg);
+      fprintf(stderr, "Runtime Error: %s\n", msg);
     } break;
   }
 }
