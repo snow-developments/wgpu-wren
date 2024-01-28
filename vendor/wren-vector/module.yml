@@ -1,0 +1,7 @@
+name: vector
+description: "Linear algebra library, including multi-dimensional vector and 4D color classes"
+author: Chance Snow <git@chancesnow.me>
+license: MIT
+entry: vector.wren
+tests: src/**/*.spec.wren
+devDependencies: [wren-assert]

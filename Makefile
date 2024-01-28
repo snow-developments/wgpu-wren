@@ -44,7 +44,7 @@ ${LIBWREN}: wren
 
 # Wren Libraries
 libs:
-	@cd lib/wren-vector && wrenc package.wren install
+	@cd vendor/wren-vector && wrenc package.wren install
 .PHONY: libs
 
 # WebGPU
