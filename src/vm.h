@@ -1,7 +1,5 @@
 #pragma once
 
-#include <assert.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <wren.h>
 
