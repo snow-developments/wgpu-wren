@@ -1,0 +1,34 @@
+{
+  "actions" : {
+    "build" : {
+      "postActions" : [
+        {
+          "script" : "#!\/bin\/sh\nmake bin\/examples\/triangle",
+          "type" : "runScript"
+        },
+        {
+          "sound" : "Blow",
+          "type" : "sound"
+        }
+      ]
+    },
+    "clean" : {
+      "postActions" : [
+        {
+          "script" : "#!\/bin\/sh\nmake clean",
+          "type" : "runScript"
+        }
+      ]
+    }
+  },
+  "buildBeforeRunning" : true,
+  "extension" : {
+    "identifier" : "tech.staysail.ClangD",
+    "name" : "C-Dragon"
+  },
+  "extensionTemplate" : "localDebug",
+  "extensionValues" : {
+    "cdragon.dap.program" : "bin\/examples\/triangle"
+  },
+  "openLogOnRun" : "fail"
+}
