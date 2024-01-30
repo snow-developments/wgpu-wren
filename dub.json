@@ -1,0 +1,21 @@
+{
+	"name": "peregrine",
+	"description": "A generic, bring your own framework/engine graphics library for games and visualizations powered by WebGPU",
+	"license": "BSD-3-Clause",
+	"copyright": "Copyright © 2024, Chance Snow",
+	"authors": [
+		"Chance Snow <git@chancesnow.me>"
+	],
+  "targetType": "staticLibrary",
+  "targetPath": "lib",
+  "dependencies": {
+    "bindbc-glfw": "~>1.1.0",
+    "wgpu-d": "~master",
+    "wren-d": "~>0.4.2"
+  },
+  "versions": ["GLFW_33"],
+  "subConfigurations": {
+    "bindbc-glfw": "static",
+    "wgpu-d": "static"
+  }
+}

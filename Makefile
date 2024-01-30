@@ -5,7 +5,7 @@ ARCH := $(shell uname -m)
 CONFIG ?= debug
 
 default: all
-all: lib/libwgpu-wren.a
+all: lib/libperegrine.a
 .PHONY: all
 
 lint:
@@ -20,27 +20,9 @@ clean:
 	# TODO: rm -rf lib/**/wren_modules
 .PHONY: clean
 
-SUBMODULES := wren
-${SUBMODULES} &:
-	git submodule update --init --recursive
-
 #############
 # Libraries
 #############
-
-# Wren
-ifeq (${CONFIG},debug)
-  LIBS += wren_d
-  LIB_WREN := wren/lib/libwren_d.a
-  LIB_WREN_CONFIG := debug_64bit
-else
-  LIBS += wren
-endif
-LIB_DIRS += wren/lib
-LIB_WREN ?= wren/lib/libwren.a
-LIB_WREN_CONFIG ?= release_64bit
-${LIB_WREN}: wren
-	@make --no-print-directory -C wren/projects/make wren config=${LIB_WREN_CONFIG}
 
 # Wren Libraries
 vendor/wren-vector/wren_modules:
@@ -55,23 +37,6 @@ vendor: native.lock.yml
 # TODO: Download wgpu-native binaries on Windows
 .PHONY: vendor
 
-# WebGPU
-ifeq (${OS},Darwin)
-  WGPU := wgpu-macos-${ARCH}-${CONFIG}
-else
-  WGPU := wgpu-${shell echo ${OS} | tr '[:upper:]' '[:lower:]'}-${ARCH}-${CONFIG}
-endif
-WGPU_DEST := vendor/${WGPU}
-ifneq (${OS},Windows)
-  LIBS += wgpu_native
-  LIB_DIRS += ${WGPU_DEST}
-else
-  $(error "Unsupported OS: ${OS)")
-endif
-${WGPU_DEST}/libwgpu_native.a: vendor
-wgpu: vendor ${WGPU_DEST}/libwgpu_native.a
-.PHONY: wgpu
-
 # GLFW
 # TODO: Refactor version into native.lock.yml
 vendor/glfw-3.3.9/build/src/libglfw3.a: vendor
@@ -84,17 +49,6 @@ glfw: vendor/glfw-3.3.9/build/src/libglfw3.a
 # Targets
 ###########
 
-CC ?= gcc
-INCLUDES := include wren/src/include vendor/${WGPU} vendor/glfw-3.3.9/include
-SOURCES := $(shell find include -name "*.h") $(shell find src -name "*.h")
-
-# C flags
-CFLAGS += -DOS_${OS}
-ifeq (${OS},Darwin)
-  CFLAGS += -DOS_MacOS
-else ifneq (${OS},Windows)
-  CFLAGS += -DOS_Unix
-endif
 # Includes
 CFLAGS += $(patsubst %,-I%,$(INCLUDES))
 ifeq (${OS},Darwin)
@@ -104,50 +58,31 @@ else ifeq (${OS},Windows)
 else
   CFLAGS := $(shell pkg-config --cflags gl) ${CFLAGS}
 endif
-# Debug symbols and optimization
-ifeq (${CONFIG},debug)
-  CFLAGS += -g
-else
-  CFLAGS += -O
-endif
 
-# Linker flags
-LDFLAGS := $(patsubst %,-L%,${LIB_DIRS})
-LDFLAGS += $(patsubst %,-l%,${LIBS})
-ifeq (${OS},Linux)
-  $(info Linking with OpenGL and X11)
-  LDFLAGS += $(shell pkg-config --static --libs gl)
-  LDFLAGS += $(shell pkg-config --static --libs x11)
-  -lrt -ldl
-endif
-LDFLAGS += -lm
-
-# See https://www.gnu.org/software/libtool/manual/html_node/Creating-object-files.html
-src/app.o: wgpu src/app.c ${SOURCES}
-	$(CC) -c src/app.c $(CFLAGS) -o $@
-# See https://www.gnu.org/software/make/manual/html_node/Archives.html
-libwgpu-wren.a: libwgpu-wren.a(src/app.o)
-	@$(AR) $(ARFLAGS) $@ $?
-	ranlib libwgpu-wren.a
-lib:
-	@mkdir -p lib
-lib/libwgpu-wren.a: lib libwgpu-wren.a
-	@mv libwgpu-wren.a lib/.
+SOURCES := $(shell find source -name *.d)
+lib/libperegrine.a: ${SOURCES}
+	dub build
 
 ################
 # Applications
 ################
 
-bin/examples/triangle: LDFLAGS += -Lvendor/glfw-3.3.9/build/src -lglfw3
 ifeq (${OS},Darwin)
   bin/examples/triangle: CFLAGS += -DGLFW_INCLUDE_NONE
-  bin/examples/triangle: LDFLAGS += -framework Cocoa -framework OpenGL -framework IOKit
+  bin/examples/triangle: LDFLAGS += -framework Cocoa -framework Metal -framework IOKit
 endif
-bin/examples/triangle: ${LIB_WREN} lib/libwgpu-wren.a glfw
+bin/examples/triangle: ${LIB_WREN} lib/libperegrine.a glfw
 	@mkdir -p bin/examples
-	$(CC) src/file.c src/string.c src/examples/triangle.c $(CFLAGS) -pthread \
-	  $(LDFLAGS) \
-	  -o $@
+	ldc2 examples/triangle.c lib/libperegrine.a \
+		-P-I${HOME}/.dub/packages/wren-d/0.4.2/wren-d/wren/src/include \
+		${HOME}/.dub/packages/wren-d/0.4.2/wren-d/wren/lib/libwren.a \
+		${HOME}/.dub/packages/wgpu-d/0.3.0/wgpu-d/subprojects/wgpu/libwgpu_native.a \
+		vendor/glfw-3.3.9/build/src/libglfw3.a \
+		-L"-framework" -L"CoreFoundation" -L"-framework" -L"QuartzCore" -L"-framework" -L"Metal" -L"-framework" -L"Cocoa" -L"-framework" -L"IOKit" \
+		--od=bin
+# $(CC) src/file.c src/string.c src/examples/triangle.c $(CFLAGS) -pthread \
+#   $(LDFLAGS) -Llib -lwgpu-wren \
+#   -o $@
 
 # macOS troubleshooting:
 # https://stackoverflow.com/a/17704255/1363247

@@ -1,7 +1,29 @@
-docs/
+# Compiled Object files
+*.o
+*.obj
+
+# Compiled libraries
+*.a
+*.lib
+*.so
+*.dylib
+*.dll
+
+# Executables
 bin/
-lib/*.a
-src/*.o
+*.exe
+
+# DUB
+dub.selections.json
+.dub
+docs/
+docs.json
+__dummy.html
+
+# Code coverage
+*.lst
+
+# Debugging Symbols
 *.dwarf
 
 # Temporary Files
