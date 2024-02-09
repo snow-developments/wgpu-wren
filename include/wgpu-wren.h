@@ -5,6 +5,7 @@
 #include <string.h>
 #include <wren.h>
 
+// TODO: Generate this with dub: https://dlang.org/blog/2021/01/11/a-new-year-a-new-release-of-d
 typedef struct WrenApp WrenApp;
 
 typedef struct string {
