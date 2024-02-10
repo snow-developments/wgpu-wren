@@ -71,6 +71,9 @@ extern (C) WrenLoadModuleResult _loadModule(WrenVM* vm, const char* name) {
 
 // See https://github.com/gfx-rs/wgpu-native/tree/v0.19.1.1
 extern (C) WrenApp* wrenAppNew(WrenAppConfig config) {
+  import std.conv : to;
+  import std.exception : enforce;
+
   if (config.vm == null) {
     WrenConfiguration wrenConfig;
     wrenInitConfiguration(&wrenConfig);
@@ -106,14 +109,15 @@ extern (C) WrenApp* wrenAppNew(WrenAppConfig config) {
   // Create WebGPU surface buffer
   Surface surface;
   version (OSX) {
-    import std.exception : enforce;
-
     auto nativeWindow = NSWindow.from(enforce(glfwGetCocoaWindow(window), "Could not get Cocoa window!"));
     auto metalLayer = CAMetalLayer.classOf.layer;
     nativeWindow.contentView.wantsLayer = true;
     nativeWindow.contentView.layer = metalLayer;
     surface = Surface.fromMetalLayer(app.instance, metalLayer.asId);
   }
+  else version (Linux) surface = Surface.fromXlib(
+    app.instance, glfwGetX11Display().enforce, glfwGetX11Window(window).enforce.to!uint
+  );
   else static assert(0, "Unsupported WebGPU target!");
 
   app.adapter = app.instance.requestAdapter(app.surface = surface);
@@ -175,6 +179,18 @@ extern (C) nothrow static void key(GLFWwindow* window, int key, int scanCode, in
 extern (C) nothrow static void fb_resize(GLFWwindow* window, int width, int height) {
   assert(width);
   assert(height);
+}
+
+version (Linux) {
+  // FIXME: Undefined return types: https://github.com/BindBC/bindbc-glfw/blob/6529ce4f67f69839a93de5e0bbe1150fab30d633/source/bindbc/glfw/bindstatic.d#L223
+  extern(C) @nogc nothrow {
+    void* glfwGetX11Display();
+    ulong glfwGetX11Window(GLFWwindow* window);
+    ulong glfwGetX11Adapter(GLFWmonitor* monitor);
+    ulong glfwGetX11Monitor(GLFWmonitor* monitor);
+    void glfwSetX11SelectionString(const(char)* string_);
+    const(char)* glfwGetX11SelectionString();
+  }
 }
 
 // mac OS interop with the Objective-C Runtime

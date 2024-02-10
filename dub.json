@@ -14,6 +14,7 @@
     "wren-d": "~>0.4.2"
   },
   "versions": ["GLFW_33"],
+  "versions-linux": ["Linux"],
   "subConfigurations": {
     "bindbc-glfw": "static",
     "wgpu-d": "static"
