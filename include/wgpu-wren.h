@@ -22,18 +22,23 @@ typedef struct WrenAppConfig {
   int height;
 } WrenAppConfig;
 
+enum WrenAppResult {
+  WrenAppResult_success,
+  WrenAppResult_badEntry
+};
+
 #if __cplusplus
 extern "C" {
 #endif
 
 WrenApp *wrenAppNew(WrenAppConfig config);
-GLFWwindow *wrenAppGetWindow(WrenApp *app);
+GLFWwindow *wrenAppGetWindow(WrenApp* app);
 /**
  * @returns Whether the app's event loop should exit.
  * @see `wrenAppRun`
  */
 typedef bool (*Callback)(void *userData);
-int wrenAppRun(WrenApp *app, Callback callback, void *userData);
+WrenAppResult wrenAppRun(WrenApp * app, Callback callback, void *userData);
 
 #if __cplusplus
 } // Extern C

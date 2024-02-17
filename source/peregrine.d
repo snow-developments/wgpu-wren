@@ -130,9 +130,16 @@ extern (C) WrenApp* wrenAppNew(WrenAppConfig config) {
 
 extern (C) GLFWwindow* wrenAppGetWindow(WrenApp* app) { return app.window; }
 
+///
+enum AppResult : uint {
+  success,
+  badEntry
+}
+
 alias Callback = extern (C) bool function(void *userData);
-extern (C) void wrenAppRun(WrenApp* app, Callback callback, void* userData) {
-  import std.file : readText;
+extern (C) AppResult wrenAppRun(WrenApp* app, Callback callback, void* userData) {
+  import std.file : exists, readText;
+  import std.stdio : writeln;
   import std.string : format;
 
   auto running = true;
@@ -140,13 +147,21 @@ extern (C) void wrenAppRun(WrenApp* app, Callback callback, void* userData) {
   WrenVM* vm = app.vm;
 
   const entry = app.config.entry;
+  if (!entry.exists) {
+    "%s: No such file or directory".format(entry).writeln;
+    return AppResult.badEntry;
+  }
   auto script = readText(entry);
-  assert(script.length, "%s: Could not read application entry".format(entry));
+  if (!script.length) {
+    "%s: Could not read application entry".format(entry).writeln;
+    return AppResult.badEntry;
+  }
 
   // Init script VM
   auto result = wrenInterpret(vm, entry.ptr, script.ptr);
   if (result != WREN_RESULT_SUCCESS) running = false;
   wrenEnsureSlots(vm, 1);
+  // TODO: Ensure entry point is a function
   assert(wrenHasVariable(vm, entry.ptr, "render".ptr), "Entry scripts must contain a render() function!");
   wrenGetVariable(vm, entry.ptr, "render".ptr, 0);
   assert(wrenGetSlotType(vm, 0) == WREN_TYPE_UNKNOWN);
@@ -166,6 +181,7 @@ extern (C) void wrenAppRun(WrenApp* app, Callback callback, void* userData) {
 
   glfwTerminate();
   wrenFreeVM(vm);
+  return AppResult.success;
 }
 
 extern (C) nothrow static void key(GLFWwindow* window, int key, int scanCode, int action, int modifiers) {
