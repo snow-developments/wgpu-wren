@@ -1,3 +1,6 @@
 {
-  "cdragon.format.onSave" : false
+  "cdragon.format.onSave" : false,
+  "workspace.art_style" : 1,
+  "workspace.color" : 14,
+  "workspace.name" : "wgpu-wren"
 }
