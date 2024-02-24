@@ -1,0 +1,18 @@
+CompileFlags:
+  Add: 
+    - "-Iinclude"
+    - "-Iwren/src/include"
+    - "-Ivendor/glfw-3.3.9/include"
+    # WebGPU Includes
+    - "-Ivendor/wgpu-linux-aarch64-debug"
+    - "-Ivendor/wgpu-linux-aarch64-release"
+    - "-Ivendor/wgpu-linux-x86_64-debug"
+    - "-Ivendor/wgpu-linux-x86_64-release"
+    - "-Ivendor/wgpu-macos-aarch64-debug"
+    - "-Ivendor/wgpu-macos-aarch64-release"
+    - "-Ivendor/wgpu-macos-x86_64-debug"
+    - "-Ivendor/wgpu-macos-x86_64-release"
+    - "-Ivendor/wgpu-windows-i686-debug"
+    - "-Ivendor/wgpu-windows-i686-release"
+    - "-Ivendor/wgpu-windows-x86_64-debug"
+    - "-Ivendor/wgpu-windows-x86_64-release"
